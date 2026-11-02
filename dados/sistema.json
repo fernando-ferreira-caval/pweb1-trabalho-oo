@@ -1,4 +1,18 @@
 {
+    "veiculos": {
+        "ABC-1234": {
+            "placa": "ABC-1234",
+            "modelo": "Mercedes-Benz",
+            "capacidade": 20,
+            "tipo": "Ônibus"
+        },
+        "1871427YIUH": {
+            "placa": "1871427YIUH",
+            "modelo": "não sei",
+            "capacidade": 3,
+            "tipo": "Ônibus"
+        }
+    },
     "rotas": {
         "centro": {
             "nome": "Rota Centro",
@@ -29,6 +43,17 @@
                 }
             ],
             "ocupacao": "Ônibus: 3\/20 vagas ocupadas"
+        },
+        "rota-1555f579": {
+            "nome": "rota complicada",
+            "veiculo": {
+                "placa": "1871427YIUH",
+                "modelo": "não sei",
+                "capacidade": 3,
+                "tipo": "Ônibus"
+            },
+            "alunos": [],
+            "ocupacao": "Ônibus: 0\/3 vagas ocupadas"
         }
     }
 }
