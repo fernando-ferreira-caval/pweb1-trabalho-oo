@@ -1,19 +1,68 @@
 <?php
-
 declare(strict_types=1);
 
-// =====================================================================
-// Roteiro de testes no terminal: php teste.php
-// Mostre cada regra funcionando e cada recusa. Cole a saída em docs/testes.md.
-// =====================================================================
+require_once __DIR__ . '/src/Veiculo.php';
+require_once __DIR__ . '/src/Onibus.php';
+require_once __DIR__ . '/src/Van.php';
+require_once __DIR__ . '/src/Aluno.php';
+require_once __DIR__ . '/src/Rota.php';
 
-// require_once __DIR__ . '/src/MinhaClasse.php';
+$onibus = new Onibus("ABC-1234", "Mercedes-Benz", 2);
+$van = new Van("DEF-5678", "Fiat Ducato", 8);
 
-echo "=== Teste 1: ... ===\n";
+echo "=== POLIMORFISMO ===\n";
 
-// try {
-//     ... uma operação que deve ser recusada ...
-//     echo "ERRO: a operação foi aceita\n";
-// } catch (Exception $e) {
-//     echo "OK, recusado: {$e->getMessage()}\n";
-// }
+$veiculos = [$onibus, $van];
+
+foreach ($veiculos as $veiculo) {
+    echo $veiculo->calcularLotacao(1) . "\n";
+}
+
+$aluno1 = new Aluno("001", "Ana", 5, "Rua A");
+$aluno2 = new Aluno("002", "Carlos", 4, "Rua B");
+$aluno3 = new Aluno("003", "Mariana", 5, "Rua C");
+
+$rota = new Rota("Rota Centro", $onibus);
+
+echo "\n=== CADASTRO DE ALUNOS ===\n";
+
+try {
+    $rota->adicionarAluno($aluno1);
+    echo "Ana adicionada com sucesso.\n";
+
+    $rota->adicionarAluno($aluno2);
+    echo "Carlos adicionado com sucesso.\n";
+
+} catch (Exception $erro) {
+    echo "Erro: " . $erro->getMessage() . "\n";
+}
+
+echo "\n=== TESTE DE ALUNO DUPLICADO ===\n";
+
+try {
+    $rota->adicionarAluno($aluno1);
+} catch (Exception $erro) {
+    echo "Erro esperado: " . $erro->getMessage() . "\n";
+}
+
+echo "\n=== TESTE DE CAPACIDADE ===\n";
+
+try {
+    $rota->adicionarAluno($aluno3);
+} catch (Exception $erro) {
+    echo "Erro esperado: " . $erro->getMessage() . "\n";
+}
+
+echo "\n=== TESTE DE VEÍCULO INVÁLIDO ===\n";
+
+try {
+    $veiculoInvalido = new Van("GHI-9012", "Fiat Ducato", 0);
+} catch (Exception $erro) {
+    echo "Erro esperado: " . $erro->getMessage() . "\n";
+}
+
+echo "\n=== DADOS DA ROTA ===\n";
+
+print_r($rota->paraArray());
+
+echo "\nOcupação: " . $rota->calcularOcupacao() . "\n";

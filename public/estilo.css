@@ -1,1 +1,247 @@
-/* Visual do sistema */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #fcfcfc;
+    color: #191919;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    width: 100%;
+    min-height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: blueviolet;
+    color: white;
+    padding: 1rem;
+}
+
+header h1 {
+    font-size: 2rem;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.3rem;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+.nav_ativo {
+    text-decoration: underline !important;
+    text-underline-offset: 0.4rem;
+    font-weight: bold;
+}
+
+main {
+    flex: 1;
+    width: 85%;
+    margin: 3rem auto;
+}
+
+main h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+main h3 {
+    font-size: 1.7rem;
+    margin-bottom: 1rem;
+}
+
+main p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+section {
+    background-color: blueviolet;
+    color: white;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 1rem;
+}
+
+section h3 {
+    font-size: 1.7rem;
+}
+
+section p {
+    font-size: 1.2rem;
+}
+
+section a {
+    display: inline-block;
+    background-color: white;
+    color: blueviolet;
+    text-decoration: none;
+    padding: 0.7rem 1rem;
+    border-radius: 1rem;
+    margin-top: 0.5rem;
+}
+
+section a:hover {
+    text-decoration: underline;
+}
+
+.pagina_inicio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card_inicio {
+    width: 70%;
+    margin: 0;
+    padding: 3rem;
+    text-align: center;
+}
+
+.card_inicio h2 {
+    font-size: 2.5rem;
+}
+
+.card_inicio p {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+}
+
+.card_inicio a {
+    display: inline-block;
+    background-color: white;
+    color: blueviolet;
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+}
+
+.card_inicio a:hover {
+    text-decoration: underline;
+}
+
+.pagina_cadastro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagina_cadastro h2 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: blueviolet;
+    color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 600px;
+}
+
+.pagina_cadastro form {
+    width: 100%;
+}
+
+form label {
+    font-size: 1.1rem;
+}
+
+form input {
+    width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+form button {
+    background-color: white;
+    color: blueviolet;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+form button:hover {
+    text-decoration: underline;
+}
+
+.sucesso {
+    background-color: #d8f5d8;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+}
+
+.erro {
+    background-color: #ffe5e5;
+    color: #9b1c1c;
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+}
+
+footer {
+    width: 100%;
+    min-height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: blueviolet;
+    color: white;
+    margin-top: 3rem;
+}
+
+footer p {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 700px) {
+    header {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    main {
+        width: 95%;
+    }
+
+    .card_inicio {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    section {
+        padding: 1rem;
+    }
+}

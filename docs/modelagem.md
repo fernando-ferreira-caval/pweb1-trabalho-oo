@@ -2,41 +2,58 @@
 
 ## Diagrama de classes
 
-Substitua o exemplo abaixo (tema 01, Feira Digital do Sertão) pelo diagrama do seu sistema.
-Legenda: `<|--` herança ("é um"), `*--` composição ("tem um"), `#` protected, `-` private, `+` public.
+Legenda: `<|--` herança ("é um"), `*--` composição ("tem um"), `-` private, `+` public.
 
 ```mermaid
 classDiagram
-    Produto <|-- ProdutoUnitario
-    Produto <|-- ProdutoPorPeso
-    Pedido "1" *-- "*" ItemPedido
-    ItemPedido --> Produto
+    Veiculo <|-- Onibus
+    Veiculo <|-- Van
+    Rota *-- Veiculo
+    Rota *-- Aluno
 
-    class Produto {
-        #string nome
-        #float preco
-        +__construct(string nome, float preco)
-        +getNome() string
-        +calcularPreco(float quantidade) float
+    class Veiculo {
+        -string placa
+        -string modelo
+        -int capacidade
+        +__construct(string placa, string modelo, int capacidade)
+        +getPlaca() string
+        +getModelo() string
+        +getCapacidade() int
+        +calcularLotacao(int quantidadeAlunos) string
         +paraArray() array
     }
-    class ProdutoUnitario {
-        +calcularPreco(float quantidade) float
+
+    class Onibus {
+        +calcularLotacao(int quantidadeAlunos) string
+        +paraArray() array
     }
-    class ProdutoPorPeso {
-        -float pesoMinimo
-        +calcularPreco(float quantidade) float
+
+    class Van {
+        +calcularLotacao(int quantidadeAlunos) string
+        +paraArray() array
     }
-    class ItemPedido {
-        -Produto produto
-        -float quantidade
-        +calcularSubtotal() float
+
+    class Aluno {
+        -string matricula
+        -string nome
+        -int idade
+        -string endereco
+        +__construct(string matricula, string nome, int idade, string endereco)
+        +getMatricula() string
+        +getNome() string
+        +getIdade() int
+        +getEndereco() string
+        +paraArray() array
     }
-    class Pedido {
-        -string cliente
-        -array itens
-        +adicionarItem(ItemPedido item) void
-        +calcularTotal() float
+
+    class Rota {
+        -string nome
+        -Veiculo veiculo
+        -array alunos
+        +__construct(string nome, Veiculo veiculo)
+        +adicionarAluno(Aluno aluno) void
+        +calcularOcupacao() string
+        +paraArray() array
     }
 ```
 
@@ -44,12 +61,22 @@ classDiagram
 
 ### Herança
 
-_(Qual é a classe mãe, quais são as filhas e por que a frase "X é um Y" vale para cada uma. Qual método é sobrescrito e por quê.)_
+A classe `Veiculo` é a classe mãe. As classes `Onibus` e `Van` são suas filhas, pois um ônibus é um veículo e uma van também é um veículo.
+
+As duas classes sobrescrevem o método `calcularLotacao()`, permitindo que cada tipo de veículo apresente sua própria implementação.
 
 ### Composição
 
-_(Qual classe guarda uma lista de objetos de outra e por que a relação é "tem um", e não "é um".)_
+A classe `Rota` possui um objeto `Veiculo` e uma lista de objetos `Aluno`.
+
+Essa relação representa composição porque uma rota possui um veículo e reúne os alunos que fazem parte dela.
+
+O método `adicionarAluno()` permite incluir alunos na rota, enquanto `calcularOcupacao()` calcula sua ocupação utilizando o veículo associado.
 
 ### Encapsulamento
 
-_(Quais atributos têm getter, quais têm setter e por que alguns não têm setter.)_
+Todas as classes possuem atributos privados (`private`), impedindo o acesso direto aos seus valores.
+
+A classe `Veiculo` possui getters para consultar placa, modelo e capacidade. A classe `Aluno` também possui getters para consultar matrícula, nome, idade e endereço.
+
+Não foram criados setters porque os dados são definidos durante a construção dos objetos e não precisam ser alterados diretamente.
