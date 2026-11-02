@@ -1,71 +1,102 @@
+
 # Diário de uso de LLM
 
-Durante o desenvolvimento do projeto, utilizei o ChatGPT como ferramenta de apoio para compreender conceitos de programação orientada a objetos, desenvolver as classes, organizar o código e resolver problemas encontrados durante a execução.
+## Ferramenta utilizada
+
+ChatGPT, da OpenAI.
+
+## Finalidade
+
+A ferramenta foi utilizada como apoio durante o desenvolvimento do sistema Transporte Escolar, principalmente na organização das classes, compreensão dos conceitos de orientação a objetos, identificação de erros, implementação das funcionalidades web e elaboração da documentação.
 
 As sugestões foram analisadas e testadas antes de serem incorporadas ao projeto.
 
-## Interação 1
+## Interação 1 — Modelagem
 
-- **Ferramenta e data:** ChatGPT, outubro de 2026.
-- **Prompt:**
+**Período:** outubro de 2026.
+
+**Solicitação:** apoio para organizar as classes de um sistema de transporte escolar e aplicar herança, composição, encapsulamento e polimorfismo.
+
+**Resposta:** orientação para estruturar as classes `Veiculo`, `Onibus`, `Van`, `Aluno` e `Rota`.
+
+**Decisão:** a estrutura foi utilizada por representar as entidades principais do sistema e atender aos requisitos de orientação a objetos.
+
+## Interação 2 — Implementação das classes
+
+**Período:** outubro de 2026.
+
+**Solicitação:** apoio para implementar classes PHP com atributos privados, construtores, métodos, herança e regras de negócio.
+
+**Resposta:** sugestões de organização dos arquivos e implementação dos métodos.
+
+**Decisão:** as classes foram implementadas em arquivos separados e verificadas com o roteiro `teste.php`.
+
+## Interação 3 — Interface
+
+**Período:** outubro de 2026.
+
+**Solicitação:** apoio para organizar a interface do sistema com HTML e CSS.
+
+**Resposta:** orientações sobre cabeçalho, navegação, formulários, espaçamento e apresentação das informações.
+
+**Decisão:** os ajustes foram avaliados visualmente no navegador.
+
+## Interação 4 — Persistência
+
+**Período:** outubro e novembro de 2026.
+
+**Solicitação:** implementar armazenamento para que os dados cadastrados não fossem perdidos ao atualizar a página ou reiniciar o servidor.
+
+**Resposta:** orientação para utilizar `file_get_contents()`, `json_decode()`, `json_encode()` e `file_put_contents()`.
+
+**Decisão:** foi adotado um arquivo JSON para armazenar os dados do sistema, evitando adicionar um banco de dados à aplicação.
+
+## Interação 5 — Ampliação dos cadastros
+
+**Data:** 2 de novembro de 2026.
+
+**Solicitação:** adicionar cadastro de veículos e rotas, preservando a estrutura visual já existente.
+
+**Resposta:** proposta de implementação dos formulários, associação de veículos às rotas, seleção de rota no cadastro de alunos e adaptação da persistência.
+
+**Decisão:** as alterações foram aplicadas ao `public/index.php`, com um pequeno complemento ao CSS existente.
+
+## Interação 6 — Correção de erro
+
+**Data:** 2 de novembro de 2026.
+
+**Problema:** ao executar `php -l public/index.php`, foi apresentado o erro:
 
 ```text
-Estou desenvolvendo um sistema de Transporte Escolar para um trabalho de PHP com orientação a objetos. Preciso organizar as classes e aplicar os conceitos de herança, composição, encapsulamento e polimorfismo.
+PHP Fatal error: strict_types declaration must be the very first statement in the script
 ```
 
-- **Resumo da resposta:** A ferramenta ajudou a estruturar o sistema, sugerindo as classes `Veiculo`, `Onibus`, `Van`, `Aluno` e `Rota`, além de explicar como os conceitos de orientação a objetos poderiam ser aplicados.
-- **O que aceitei, modifiquei ou rejeitei, e por quê:** Utilizei a estrutura sugerida porque ela atendia aos requisitos do trabalho e representava as entidades principais do sistema.
+**Resposta:** a ferramenta explicou que `declare(strict_types=1)` precisa ser a primeira instrução do arquivo PHP.
 
-## Interação 2
+**Decisão:** a organização inicial do arquivo foi corrigida, e a verificação de sintaxe passou a funcionar.
 
-- **Ferramenta e data:** ChatGPT, outubro de 2026.
-- **Prompt:**
+## Interação 7 — Documentação
 
-```text
-Preciso implementar as classes do sistema em PHP utilizando atributos privados, construtores, métodos e herança. Explique como organizar cada classe em seu próprio arquivo.
-```
+**Data:** 2 de novembro de 2026.
 
-- **Resumo da resposta:** A ferramenta auxiliou na criação das classes, na definição dos atributos e métodos e na aplicação de herança entre `Veiculo`, `Onibus` e `Van`.
-- **O que aceitei, modifiquei ou rejeitei, e por quê:** Aproveitei a estrutura apresentada e utilizei os testes no terminal para verificar se as classes funcionavam corretamente.
+**Solicitação:** atualizar o README, a modelagem, os testes e o diário de uso de LLM de acordo com as funcionalidades implementadas.
 
-## Interação 3
+**Resposta:** revisão da documentação existente e elaboração de novos textos baseados no código disponível no repositório.
 
-- **Ferramenta e data:** ChatGPT, outubro de 2026.
-- **Prompt:**
+**Decisão:** os documentos foram preparados para revisão e incorporação ao projeto.
 
-```text
-Estou desenvolvendo a interface do sistema e preciso ajustar o CSS para organizar o cabeçalho, o menu, o conteúdo principal, os formulários e o rodapé.
-```
+## Limitações e erros identificados
 
-- **Resumo da resposta:** A ferramenta sugeriu ajustes na organização do CSS, incluindo alinhamento dos elementos, centralização do conteúdo, espaçamento e apresentação dos formulários.
-- **O que aceitei, modifiquei ou rejeitei, e por quê:** Utilizei os ajustes sugeridos e verifiquei o resultado no navegador, mantendo as alterações que melhoraram a apresentação da interface.
+Durante o desenvolvimento, algumas respostas da ferramenta precisaram ser verificadas ou corrigidas.
 
-## Interação 4
+Um exemplo ocorreu na documentação de testes, quando uma mensagem do terminal foi reproduzida com uma alteração de texto.
 
-- **Ferramenta e data:** ChatGPT, outubro e novembro de 2026.
-- **Prompt:**
+Outro problema ocorreu durante a substituição do código PHP, quando a posição da declaração `strict_types` provocou um erro de sintaxe.
 
-```text
-Estou encontrando erros durante a execução do projeto PHP. Vou enviar os comandos e as mensagens do terminal para identificar o problema e corrigir o código.
-```
+Essas situações demonstraram a necessidade de conferir o código gerado, executar os testes e comparar a documentação com o comportamento real do sistema.
 
-- **Resumo da resposta:** A ferramenta auxiliou na identificação de problemas relacionados à execução do PHP, à organização dos arquivos e ao funcionamento das funcionalidades do sistema.
-- **O que aceitei, modifiquei ou rejeitei, e por quê:** Analisei as orientações, apliquei as correções necessárias e executei novamente os comandos para verificar se os problemas haviam sido resolvidos.
+## Considerações finais
 
-## Interação 5
+A LLM contribuiu para o desenvolvimento do projeto, mas não substituiu a execução dos testes nem a análise das funcionalidades.
 
-- **Ferramenta e data:** ChatGPT, novembro de 2026.
-- **Prompt:**
-
-```text
-Preciso testar meu sistema e documentar os resultados. Vou enviar a saída do terminal e as respostas das requisições HTTP para organizar o arquivo testes.md.
-```
-
-- **Resumo da resposta:** A ferramenta ajudou a organizar os testes de polimorfismo, cadastro de alunos, validação das regras de negócio, páginas HTTP, respostas JSON e tratamento de erros do formulário.
-- **O que aceitei, modifiquei ou rejeitei, e por quê:** Utilizei os resultados reais obtidos no terminal e no navegador para preencher a documentação, evitando registrar resultados que não haviam sido testados.
-
-## O erro que a LLM cometeu
-
-Durante a organização do arquivo `testes.md`, a ferramenta alterou incorretamente uma linha da saída original do terminal. A mensagem `Carlos adicionado com sucesso.` foi reproduzida como `Carlos adicionados com sucesso.`.
-
-O erro foi identificado pela comparação com a saída real do terminal. A documentação deve preservar o resultado original, portanto a linha precisa ser corrigida.
+O uso da ferramenta foi direcionado ao aprendizado, à implementação e à revisão do trabalho.

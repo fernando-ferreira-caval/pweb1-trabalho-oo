@@ -1,161 +1,211 @@
-# Testes
 
-## Roteiro de testes no terminal
+# Testes do sistema Transporte Escolar
 
-Comando: `php teste.php`
+## Objetivo
+
+Verificar o funcionamento das classes, das regras de negócio, das páginas web, dos formulários e da persistência dos dados.
+
+## 1. Testes das classes
+
+O arquivo `teste.php` contém testes de polimorfismo, cadastro de alunos, capacidade dos veículos e conversão de objetos para arrays.
+
+Comando:
+
+```bash
+php teste.php
+```
+
+### Polimorfismo
+
+O teste cria um ônibus com capacidade para dois alunos e uma van com capacidade para oito alunos.
+
+Os dois objetos são colocados em um array e percorrem um `foreach`, que chama `calcularLotacao()`.
+
+Saída esperada:
 
 ```text
 === POLIMORFISMO ===
 Ônibus: 1/2 vagas ocupadas
 Van: 1/8 vagas ocupadas
+```
 
+### Cadastro de alunos
+
+O teste adiciona dois alunos à rota Centro.
+
+Saída esperada:
+
+```text
 === CADASTRO DE ALUNOS ===
 Ana adicionada com sucesso.
 Carlos adicionado com sucesso.
+```
 
+### Matrícula duplicada
+
+O teste tenta adicionar novamente um aluno com matrícula já existente na rota.
+
+Saída esperada:
+
+```text
 === TESTE DE ALUNO DUPLICADO ===
 Erro esperado: Este aluno já está cadastrado na rota.
+```
 
+### Limite de capacidade
+
+O teste tenta adicionar um terceiro aluno a um ônibus com capacidade para dois.
+
+Saída esperada:
+
+```text
 === TESTE DE CAPACIDADE ===
 Erro esperado: A capacidade máxima do veículo foi atingida.
+```
 
+### Capacidade inválida
+
+O teste tenta criar uma van com capacidade zero.
+
+Saída esperada:
+
+```text
 === TESTE DE VEÍCULO INVÁLIDO ===
 Erro esperado: A capacidade do veículo deve ser maior que zero.
+```
 
-=== DADOS DA ROTA ===
-Array
-(
-    [nome] => Rota Centro
-    [veiculo] => Array
-        (
-            [placa] => ABC-1234
-            [modelo] => Mercedes-Benz
-            [capacidade] => 2
-            [tipo] => Ônibus
-        )
+### Conversão para array
 
-    [alunos] => Array
-        (
-            [0] => Array
-                (
-                    [matricula] => 001
-                    [nome] => Ana
-                    [idade] => 5
-                    [endereco] => Rua A
-                )
+O teste chama `Rota::paraArray()` e apresenta os dados da rota, do veículo e dos alunos.
 
-            [1] => Array
-                (
-                    [matricula] => 002
-                    [nome] => Carlos
-                    [idade] => 4
-                    [endereco] => Rua B
-                )
+A ocupação final esperada é:
 
-        )
-
-    [ocupacao] => Ônibus: 2/2 vagas ocupadas
-)
-
+```text
 Ocupação: Ônibus: 2/2 vagas ocupadas
 ```
 
-**Explicação de cada linha:**
+## 2. Testes HTTP
 
-- **Polimorfismo:** o ônibus e a van executaram o método `calcularLotacao()`, apresentando resultados de acordo com suas capacidades.
-- **Cadastro de alunos:** Ana e Carlos foram adicionados à rota com sucesso.
-- **Aluno duplicado:** a tentativa de cadastrar novamente um aluno com a mesma matrícula foi recusada.
-- **Capacidade:** a tentativa de adicionar um aluno acima da capacidade do veículo foi recusada.
-- **Veículo inválido:** a criação de um veículo com capacidade zero foi impedida.
-- **Dados da rota:** o método `paraArray()` retornou os dados da rota, do veículo e dos alunos.
-- **Ocupação:** a rota identificou corretamente que as duas vagas disponíveis estavam ocupadas.
+Inicie o servidor:
 
-## Camada web
-
-**Uma página que existe:** `curl -i "http://localhost:8000/?pagina=rotas"`
-
-```text
-HTTP/1.1 200 OK
-Content-type: text/html; charset=UTF-8
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-...
-</html>
+```bash
+php -S localhost:8000 -t public
 ```
 
-O resultado HTTP 200 comprova que a página existe e foi carregada corretamente. A resposta também apresenta a rota Centro, seu veículo e a ocupação.
+### Página existente
 
-**Uma página que não existe:** `curl -i "http://localhost:8000/?pagina=inexistente"`
-
-```text
-HTTP/1.1 404 Not Found
-Content-type: text/html; charset=UTF-8
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-...
-<h2>Página não encontrada</h2>
-<p>A página solicitada não existe.</p>
-...
-</html>
+```bash
+curl -i "http://localhost:8000/?pagina=rotas"
 ```
 
-O resultado HTTP 404 comprova que o sistema identifica páginas inexistentes e apresenta uma mensagem informando que a página solicitada não foi encontrada.
+Resultado esperado: HTTP 200 e conteúdo HTML com as rotas cadastradas.
 
-**A rota JSON:** `curl -i "http://localhost:8000/?formato=json"`
+### Página inexistente
+
+```bash
+curl -i "http://localhost:8000/?pagina=inexistente"
+```
+
+Resultado esperado: HTTP 404 e mensagem `Página não encontrada`.
+
+### Identificador de rota inexistente
+
+```bash
+curl -i "http://localhost:8000/?pagina=rota&id=inexistente"
+```
+
+Resultado esperado: HTTP 404.
+
+### Resposta JSON
+
+```bash
+curl -i "http://localhost:8000/?formato=json"
+```
+
+Resultado esperado:
 
 ```text
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
-
-{
-    "rotas": {
-        "centro": {
-            "nome": "Rota Centro",
-            "veiculo": {
-                "placa": "ABC-1234",
-                "modelo": "Mercedes-Benz",
-                "capacidade": 20,
-                "tipo": "Ônibus"
-            },
-            "alunos": [
-                {
-                    "matricula": "001",
-                    "nome": "Ana",
-                    "idade": 5,
-                    "endereco": "Rua A"
-                },
-                {
-                    "matricula": "002",
-                    "nome": "Carlos",
-                    "idade": 4,
-                    "endereco": "Rua B"
-                }
-            ],
-            "ocupacao": "Ônibus: 2\\/20 vagas ocupadas"
-        }
-    }
-}
 ```
 
-O resultado HTTP 200 comprova que a requisição foi processada corretamente. O cabeçalho `Content-Type` identifica a resposta como JSON. Os dados demonstram que o sistema consegue converter os objetos em uma estrutura JSON utilizando `paraArray()` e `json_encode()`.
+O corpo deve conter as coleções `veiculos` e `rotas`.
 
-**O formulário com um dado inválido:** envio de uma matrícula já cadastrada (`001`).
+## 3. Testes dos formulários
 
-Comando:
+Os testes abaixo utilizam o navegador e devem ser realizados com dados fictícios.
 
-```bash
-curl -i -X POST "http://localhost:8000/?pagina=cadastro" -d "matricula=001&nome=Teste&idade=5&endereco=Rua+C"
-```
+| Teste | Procedimento | Resultado esperado |
+|---|---|---|
+| Cadastro de ônibus | Informar placa, modelo e capacidade válidos | Veículo cadastrado |
+| Cadastro de van | Selecionar Van e preencher os campos | Veículo cadastrado |
+| Placa duplicada | Repetir uma placa cadastrada | Mensagem de erro |
+| Capacidade zero | Enviar capacidade igual a zero | Cadastro recusado |
+| Cadastro de rota | Informar nome e selecionar veículo | Rota cadastrada |
+| Nome de rota repetido | Cadastrar outra rota com o mesmo nome | Mensagem de erro |
+| Veículo ocupado | Associar um veículo já utilizado a outra rota | Cadastro recusado |
+| Cadastro de aluno | Preencher dados e selecionar rota | Aluno cadastrado |
+| Matrícula repetida | Reutilizar matrícula existente | Cadastro recusado |
+| Capacidade esgotada | Adicionar aluno a uma rota lotada | Cadastro recusado |
+
+## 4. Persistência
+
+Procedimento:
+
+1. Cadastrar um veículo.
+2. Cadastrar uma rota utilizando esse veículo.
+3. Cadastrar um aluno na rota.
+4. Encerrar o servidor PHP.
+5. Iniciar o servidor novamente.
+6. Consultar as páginas de veículos, rotas e alunos.
+
+Resultado esperado: os cadastros continuam disponíveis após reiniciar o servidor.
+
+O armazenamento utiliza `dados/sistema.json`.
+
+## 5. Testes de segurança e validação
+
+### Dados HTML
+
+Cadastrar um nome contendo caracteres especiais, como:
 
 ```text
-HTTP/1.1 200 OK
-Content-type: text/html; charset=UTF-8
-
-<p class="erro">Este aluno já está cadastrado na rota.</p>
+Ana & Carlos
 ```
 
-O resultado comprova que o formulário recebe os dados por POST, identifica matrículas duplicadas e apresenta a mensagem de erro por meio do tratamento de exceções com `try/catch`.</textarea>
+Resultado esperado: o texto aparece corretamente no HTML, sem ser interpretado como código.
 
-Inclua também um print da página mostrando a mensagem de recusa e o log do servidor.
+### Dados numéricos
+
+Informar valores inválidos para idade ou capacidade.
+
+Resultado esperado: o sistema recusa valores que não atendem às regras.
+
+### Seleção de rota
+
+Tentar enviar um identificador de rota inexistente.
+
+Resultado esperado: o cadastro é recusado.
+
+## 6. Evidências
+
+Registrar capturas de tela das seguintes situações:
+
+- Página de veículos cadastrados.
+- Formulário de cadastro de veículo.
+- Página de rotas cadastradas.
+- Formulário de cadastro de rota.
+- Formulário de cadastro de aluno.
+- Mensagem de erro de validação.
+- Resposta JSON.
+- Resultado do comando `php teste.php`.
+
+## 7. Situação dos testes
+
+O roteiro de testes das classes já foi utilizado durante o desenvolvimento.
+
+Após a ampliação do sistema, foram verificados manualmente os cadastros de veículos, rotas e alunos, conforme os testes realizados no navegador.
+
+Os comandos HTTP e os casos de validação descritos neste documento também servem como roteiro de regressão para novas alterações.
+
+Os resultados esperados não devem ser confundidos com evidências de execução: cada resultado precisa ser confirmado antes de ser apresentado como teste realizado.
