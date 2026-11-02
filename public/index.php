@@ -9,19 +9,90 @@ require_once __DIR__ . '/../src/Aluno.php';
 require_once __DIR__ . '/../src/Rota.php';
 
 
-$onibus = new Onibus("ABC-1234", "Mercedes-Benz", 20);
+$arquivoDados = __DIR__ . '/../dados/sistema.json';
 
-$rota = new Rota("Rota Centro", $onibus);
+$salvarDados = static function (array $rotas) use ($arquivoDados): void {
+    $dados = [];
 
-$aluno1 = new Aluno("001", "Ana", 5, "Rua A");
-$aluno2 = new Aluno("002", "Carlos", 4, "Rua B");
+    foreach ($rotas as $id => $rotaAtual) {
+        $dados[$id] = $rotaAtual->paraArray();
+    }
 
-$rota->adicionarAluno($aluno1);
-$rota->adicionarAluno($aluno2);
+    $json = json_encode(
+        ["rotas" => $dados],
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+    );
 
-$rotas = [
-    "centro" => $rota
-];
+    file_put_contents($arquivoDados, $json, LOCK_EX);
+};
+
+$carregarDados = static function () use ($arquivoDados): array {
+    if (!is_file($arquivoDados)) {
+        return [];
+    }
+
+    $conteudo = file_get_contents($arquivoDados);
+
+    if ($conteudo === false) {
+        throw new RuntimeException("Não foi possível ler os dados.");
+    }
+
+    $dados = json_decode($conteudo, true, 512, JSON_THROW_ON_ERROR);
+    $rotas = [];
+
+    foreach ($dados["rotas"] ?? [] as $id => $dadosRota) {
+        $dadosVeiculo = $dadosRota["veiculo"];
+
+        if ($dadosVeiculo["tipo"] === "Ônibus") {
+            $veiculo = new Onibus(
+                $dadosVeiculo["placa"],
+                $dadosVeiculo["modelo"],
+                $dadosVeiculo["capacidade"]
+            );
+        } elseif ($dadosVeiculo["tipo"] === "Van") {
+            $veiculo = new Van(
+                $dadosVeiculo["placa"],
+                $dadosVeiculo["modelo"],
+                $dadosVeiculo["capacidade"]
+            );
+        } else {
+            throw new RuntimeException("Tipo de veículo inválido.");
+        }
+
+        $rotaAtual = new Rota($dadosRota["nome"], $veiculo);
+
+        foreach ($dadosRota["alunos"] as $dadosAluno) {
+            $aluno = new Aluno(
+                $dadosAluno["matricula"],
+                $dadosAluno["nome"],
+                $dadosAluno["idade"],
+                $dadosAluno["endereco"]
+            );
+
+            $rotaAtual->adicionarAluno($aluno);
+        }
+
+        $rotas[$id] = $rotaAtual;
+    }
+
+    return $rotas;
+};
+
+$rotas = $carregarDados();
+
+if (!is_file($arquivoDados)) {
+    $onibus = new Onibus("ABC-1234", "Mercedes-Benz", 20);
+    $rota = new Rota("Rota Centro", $onibus);
+
+    $rota->adicionarAluno(new Aluno("001", "Ana", 5, "Rua A"));
+    $rota->adicionarAluno(new Aluno("002", "Carlos", 4, "Rua B"));
+
+    $rotas = ["centro" => $rota];
+
+    $salvarDados($rotas);
+}
+
+$rota = $rotas["centro"];
 
 
 $mensagem = "";
@@ -53,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $pagina === "cadastro") {
         );
 
         $rota->adicionarAluno($novoAluno);
-
+        $salvarDados($rotas);
         $mensagem = "Aluno cadastrado com sucesso!";
 
     } catch (Exception $excecao) {

@@ -1,0 +1,34 @@
+{
+    "rotas": {
+        "centro": {
+            "nome": "Rota Centro",
+            "veiculo": {
+                "placa": "ABC-1234",
+                "modelo": "Mercedes-Benz",
+                "capacidade": 20,
+                "tipo": "Ônibus"
+            },
+            "alunos": [
+                {
+                    "matricula": "001",
+                    "nome": "Ana",
+                    "idade": 5,
+                    "endereco": "Rua A"
+                },
+                {
+                    "matricula": "002",
+                    "nome": "Carlos",
+                    "idade": 4,
+                    "endereco": "Rua B"
+                },
+                {
+                    "matricula": "12423556464",
+                    "nome": "Fernando Éverson Ferreira Cavalcante",
+                    "idade": 231,
+                    "endereco": "122441"
+                }
+            ],
+            "ocupacao": "Ônibus: 3\/20 vagas ocupadas"
+        }
+    }
+}
