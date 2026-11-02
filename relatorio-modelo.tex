@@ -1,0 +1,687 @@
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage[a4paper,top=3cm,left=3cm,right=2cm,bottom=2cm]{geometry}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{float}
+
+\onehalfspacing
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    backgroundcolor=\color{gray!8},
+    frame=single,
+    rulecolor=\color{gray!40},
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    showstringspaces=false,
+    literate=
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1
+        {ó}{{\'o}}1 {ú}{{\'u}}1 {â}{{\^a}}1
+        {ê}{{\^e}}1 {ô}{{\^o}}1 {ã}{{\~a}}1
+        {õ}{{\~o}}1 {ç}{{\c{c}}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1
+        {à}{{\`a}}1
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+
+    {\large
+    INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO CEARÁ\\
+    CAMPUS BOA VIAGEM\\
+    TECNOLOGIA EM ANÁLISE E DESENVOLVIMENTO DE SISTEMAS
+    \par}
+
+    \vspace{3cm}
+
+    {\large
+    FERNANDO EVERSON FERREIRA CAVALCANTE
+    \par}
+
+    \vspace{3cm}
+
+    {\Large\bfseries
+    TRANSPORTE ESCOLAR
+    \par}
+
+    \vspace{0.5cm}
+
+    {\large
+    Sistema web orientado a objetos em PHP
+    \par}
+
+    \vfill
+
+    {\large
+    Relatório do trabalho individual da disciplina Programação Web I\\
+    Professor: Prof. Dr. Renato William Rodrigues de Souza
+    \par}
+
+    \vspace{2cm}
+
+    {\large
+    Boa Viagem, CE\\
+    2026
+    \par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introdução}
+
+O transporte escolar é um serviço que necessita de organização para relacionar veículos, rotas e alunos. O controle dessas informações permite identificar os estudantes atendidos por determinada rota, verificar a capacidade dos veículos e acompanhar a quantidade de vagas ocupadas.
+
+O sistema \textbf{Transporte Escolar} foi desenvolvido com o objetivo de representar essas operações em uma aplicação web simples, utilizando PHP e conceitos de Programação Orientada a Objetos (POO).
+
+A aplicação permite cadastrar ônibus e vans, criar rotas associadas aos veículos disponíveis e cadastrar alunos nas rotas existentes. Também oferece páginas para consultar os registros e visualizar a ocupação de cada veículo.
+
+O público-alvo do sistema são pessoas responsáveis pela organização do transporte escolar, como funcionários administrativos e gestores que necessitam consultar informações sobre veículos e estudantes.
+
+O desenvolvimento foi realizado utilizando PHP, HTML, CSS e JSON, sem a utilização de frameworks ou sistemas gerenciadores de banco de dados. Os registros são armazenados em um arquivo JSON, permitindo sua recuperação após o encerramento do servidor.
+
+Este relatório apresenta os requisitos do sistema, a modelagem das classes, a implementação dos conceitos de orientação a objetos, a camada web, os testes, as ferramentas utilizadas, o uso de inteligência artificial e as dificuldades encontradas durante o desenvolvimento.
+
+\section{Requisitos}
+
+\subsection{Funcionalidades}
+
+O sistema possui as seguintes funcionalidades:
+
+\begin{itemize}
+    \item Exibir uma página inicial com acesso às funcionalidades.
+    \item Cadastrar ônibus e vans.
+    \item Listar veículos cadastrados.
+    \item Cadastrar rotas associadas a veículos existentes.
+    \item Listar rotas e consultar seus detalhes.
+    \item Cadastrar alunos em rotas selecionadas.
+    \item Listar os alunos cadastrados e suas respectivas rotas.
+    \item Calcular a ocupação dos veículos.
+    \item Validar os dados recebidos pelos formulários.
+    \item Armazenar e recuperar informações utilizando JSON.
+    \item Disponibilizar os registros por meio de uma resposta HTTP em formato JSON.
+    \item Retornar HTTP 404 para páginas ou identificadores de rotas inexistentes.
+\end{itemize}
+
+A navegação é controlada pelo parâmetro \texttt{pagina} da URL. Os formulários utilizam o método HTTP POST, enquanto as consultas são realizadas por GET.
+
+\subsection{Regras de negócio}
+
+As principais regras implementadas diretamente nas classes são apresentadas na Tabela~\ref{tab:regras}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{@{}cXX@{}}
+\toprule
+\textbf{Nº} & \textbf{Regra} & \textbf{Classe e método} \\
+\midrule
+1 & A capacidade do veículo deve ser maior que zero. &
+\texttt{Veiculo::\_\_construct()} \\
+2 & Um aluno não pode possuir matrícula duplicada na mesma rota. &
+\texttt{Rota::adicionarAluno()} \\
+3 & A quantidade de alunos não pode ultrapassar a capacidade do veículo. &
+\texttt{Rota::adicionarAluno()} \\
+\bottomrule
+\end{tabularx}
+\caption{Regras de negócio implementadas nas classes.}
+\label{tab:regras}
+\end{table}
+
+Além dessas regras, a camada web realiza outras validações:
+
+\begin{itemize}
+    \item Impede o cadastro de veículos com placas repetidas.
+    \item Impede o cadastro de rotas com nomes repetidos.
+    \item Impede a associação de um veículo a duas rotas.
+    \item Impede matrículas duplicadas entre as rotas.
+    \item Exige a seleção de uma rota existente no cadastro de alunos.
+    \item Verifica o preenchimento dos campos obrigatórios.
+\end{itemize}
+
+Quando uma regra é violada, o sistema utiliza exceções para interromper a operação e apresentar uma mensagem de erro.
+
+\section{Modelagem}
+
+A modelagem foi organizada em cinco classes principais: \texttt{Veiculo}, \texttt{Onibus}, \texttt{Van}, \texttt{Aluno} e \texttt{Rota}.
+
+A classe \texttt{Veiculo} representa as características compartilhadas pelos veículos. As classes \texttt{Onibus} e \texttt{Van} especializam esse comportamento. A classe \texttt{Aluno} representa os estudantes, enquanto \texttt{Rota} organiza o veículo utilizado e os alunos associados.
+
+\begin{figure}[H]
+    \centering
+    \IfFileExists{diagrama.png}{
+        \includegraphics[width=0.95\linewidth]{diagrama.png}
+    }{
+        \fbox{
+            \parbox{0.85\linewidth}{
+                \centering
+                \vspace{1.5cm}
+                Diagrama de classes\\
+                Adicionar o arquivo diagrama.png ao Overleaf.
+                \vspace{1.5cm}
+            }
+        }
+    }
+    \caption{Diagrama de classes do sistema Transporte Escolar.}
+    \label{fig:diagrama}
+\end{figure}
+
+\subsection{Herança}
+
+A herança é aplicada por meio da classe mãe \texttt{Veiculo} e das classes filhas \texttt{Onibus} e \texttt{Van}.
+
+Essa relação segue o princípio ``é um'', pois tanto um ônibus quanto uma van são tipos de veículos.
+
+A classe mãe concentra atributos e métodos comuns, como placa, modelo, capacidade e cálculo de lotação.
+
+As classes filhas utilizam \texttt{extends} e chamam o construtor da classe mãe por meio de \texttt{parent::\_\_construct()}.
+
+O método \texttt{calcularLotacao()} é sobrescrito para apresentar o tipo de veículo no resultado.
+
+\subsection{Composição}
+
+A classe \texttt{Rota} possui um objeto \texttt{Veiculo} e mantém uma lista de objetos \texttt{Aluno}.
+
+Essa organização representa a relação ``tem um'', pois uma rota possui um veículo associado e reúne os alunos atendidos.
+
+O método \texttt{adicionarAluno()} controla a inclusão dos estudantes e verifica as regras de matrícula duplicada e capacidade.
+
+O método \texttt{calcularOcupacao()} utiliza o veículo associado para apresentar a quantidade de vagas ocupadas.
+
+Os veículos também podem existir independentemente das rotas, pois são cadastrados separadamente. Portanto, a associação entre rota e veículo não exige que o veículo seja criado dentro da classe \texttt{Rota}.
+
+\section{Implementação}
+
+\subsection{Encapsulamento e construtores (OO1 e OO4)}
+
+O encapsulamento foi aplicado por meio de atributos privados nas classes.
+
+O exemplo abaixo apresenta parte da implementação de \texttt{Veiculo}.
+
+\begin{lstlisting}[language=PHP]
+class Veiculo
+{
+    private string $placa;
+    private string $modelo;
+    private int $capacidade;
+
+    public function __construct(
+        string $placa,
+        string $modelo,
+        int $capacidade
+    ) {
+        if ($capacidade < 1) {
+            throw new Exception(
+                "A capacidade do veículo deve ser maior que zero."
+            );
+        }
+
+        $this->placa = $placa;
+        $this->modelo = $modelo;
+        $this->capacidade = $capacidade;
+    }
+}
+\end{lstlisting}
+
+O uso de \texttt{private} impede o acesso direto aos atributos fora da classe. Os valores são recebidos pelo construtor e podem ser consultados por meio dos getters.
+
+O construtor também realiza uma validação para impedir a criação de veículos com capacidade inválida.
+
+Todas as cinco classes possuem construtores e atributos tipados, e os arquivos utilizam \texttt{declare(strict\_types=1)}.
+
+\subsection{Herança e sobrescrita (OO2)}
+
+A classe \texttt{Onibus} herda de \texttt{Veiculo} e sobrescreve o método de cálculo de lotação.
+
+\begin{lstlisting}[language=PHP]
+class Onibus extends Veiculo
+{
+    public function __construct(
+        string $placa,
+        string $modelo,
+        int $capacidade
+    ) {
+        parent::__construct(
+            $placa,
+            $modelo,
+            $capacidade
+        );
+    }
+
+    public function calcularLotacao(
+        int $quantidadeAlunos
+    ): string {
+        return "Ônibus: " .
+            parent::calcularLotacao($quantidadeAlunos);
+    }
+}
+\end{lstlisting}
+
+A classe \texttt{Van} utiliza a mesma estrutura de herança, apresentando a identificação ``Van'' no resultado.
+
+A sobrescrita permite especializar o comportamento sem repetir toda a lógica de cálculo da classe mãe.
+
+\subsection{Polimorfismo (OO3)}
+
+O polimorfismo é demonstrado no arquivo \texttt{teste.php}, por meio de um array contendo objetos de diferentes classes.
+
+\begin{lstlisting}[language=PHP]
+$veiculos = [$onibus, $van];
+
+foreach ($veiculos as $veiculo) {
+    echo $veiculo->calcularLotacao(1) . "\n";
+}
+\end{lstlisting}
+
+Mesmo utilizando a mesma chamada de método, o resultado depende do tipo concreto do objeto.
+
+\begin{lstlisting}
+Ônibus: 1/2 vagas ocupadas
+Van: 1/8 vagas ocupadas
+\end{lstlisting}
+
+Esse comportamento permite trabalhar com diferentes tipos de veículos por meio de uma interface comum herdada de \texttt{Veiculo}.
+
+\subsection{Regras de negócio com exceções (OO5)}
+
+O método \texttt{adicionarAluno()} verifica se a matrícula já existe na rota e se ainda há vagas disponíveis.
+
+\begin{lstlisting}[language=PHP]
+public function adicionarAluno(Aluno $aluno): void
+{
+    foreach ($this->alunos as $alunoAdicionado) {
+        if (
+            $alunoAdicionado->getMatricula() ===
+            $aluno->getMatricula()
+        ) {
+            throw new Exception(
+                "Este aluno já está cadastrado na rota."
+            );
+        }
+    }
+
+    if (
+        count($this->alunos) >=
+        $this->veiculo->getCapacidade()
+    ) {
+        throw new Exception(
+            "A capacidade máxima do veículo foi atingida."
+        );
+    }
+
+    $this->alunos[] = $aluno;
+}
+\end{lstlisting}
+
+O uso de \texttt{throw new Exception()} permite interromper operações que violam as regras do sistema.
+
+Na camada web, essas exceções são tratadas com \texttt{try/catch}, permitindo apresentar uma mensagem ao usuário.
+
+\subsection{Composição (OO6)}
+
+A classe \texttt{Rota} mantém referências para objetos de outras classes.
+
+\begin{lstlisting}[language=PHP]
+class Rota
+{
+    private string $nome;
+    private Veiculo $veiculo;
+    private array $alunos = [];
+
+    public function __construct(
+        string $nome,
+        Veiculo $veiculo
+    ) {
+        $this->nome = $nome;
+        $this->veiculo = $veiculo;
+    }
+
+    public function calcularOcupacao(): string
+    {
+        return $this->veiculo->calcularLotacao(
+            count($this->alunos)
+        );
+    }
+}
+\end{lstlisting}
+
+A rota utiliza a capacidade do veículo associado e a quantidade de alunos armazenados para calcular a ocupação.
+
+Dessa forma, a operação depende da colaboração entre os objetos.
+
+\subsection{Organização em arquivos e conversão para JSON (OO7 e OO8)}
+
+As classes estão separadas na pasta \texttt{src/}.
+
+\begin{lstlisting}
+src/
+    Aluno.php
+    Veiculo.php
+    Onibus.php
+    Van.php
+    Rota.php
+\end{lstlisting}
+
+O arquivo \texttt{public/index.php} carrega as classes utilizando \texttt{require\_once}.
+
+\begin{lstlisting}[language=PHP]
+require_once __DIR__ . '/../src/Veiculo.php';
+require_once __DIR__ . '/../src/Onibus.php';
+require_once __DIR__ . '/../src/Van.php';
+require_once __DIR__ . '/../src/Aluno.php';
+require_once __DIR__ . '/../src/Rota.php';
+\end{lstlisting}
+
+Todas as classes possuem o método \texttt{paraArray()}, que permite converter os objetos para arrays associativos.
+
+\begin{lstlisting}[language=PHP]
+public function paraArray(): array
+{
+    return [
+        "placa" => $this->placa,
+        "modelo" => $this->modelo,
+        "capacidade" => $this->capacidade
+    ];
+}
+\end{lstlisting}
+
+Os arrays são utilizados na geração das respostas JSON e no armazenamento dos dados.
+
+A persistência utiliza \texttt{json\_encode()}, \texttt{json\_decode()}, \texttt{file\_put\_contents()} e \texttt{file\_get\_contents()}.
+
+O arquivo \texttt{dados/sistema.json} contém os veículos e as rotas, incluindo os alunos associados.
+
+\section{Camada web}
+
+A camada web foi implementada no arquivo \texttt{public/index.php}, responsável pelo processamento das requisições e pela apresentação das páginas.
+
+\subsection{Navegação}
+
+A navegação utiliza o parâmetro \texttt{pagina} da URL.
+
+As principais páginas são:
+
+\begin{itemize}
+    \item \texttt{?pagina=inicio}
+    \item \texttt{?pagina=veiculos}
+    \item \texttt{?pagina=cadastro-veiculo}
+    \item \texttt{?pagina=rotas}
+    \item \texttt{?pagina=cadastro-rota}
+    \item \texttt{?pagina=alunos}
+    \item \texttt{?pagina=cadastro}
+\end{itemize}
+
+A consulta aos detalhes de uma rota utiliza também o parâmetro \texttt{id}.
+
+\subsection{Tratamento de páginas inexistentes}
+
+O sistema mantém uma lista de páginas permitidas.
+
+Caso o usuário solicite uma página não reconhecida, é utilizado:
+
+\begin{lstlisting}[language=PHP]
+if (!in_array($pagina, $paginasPermitidas, true)) {
+    http_response_code(404);
+    $pagina = '404';
+}
+\end{lstlisting}
+
+A mesma resposta é utilizada quando o identificador de uma rota não existe.
+
+\subsection{Formulários POST}
+
+Os formulários permitem cadastrar veículos, rotas e alunos.
+
+O processamento acontece no início do arquivo PHP, antes da apresentação do HTML.
+
+As informações são obtidas por meio de \texttt{\$\_POST}, validadas e utilizadas na criação dos objetos.
+
+Um exemplo de validação é a verificação de matrícula duplicada.
+
+\begin{lstlisting}[language=PHP]
+foreach ($rotas as $rotaAtual) {
+    foreach ($rotaAtual->getAlunos() as $alunoAtual) {
+        if ($alunoAtual->getMatricula() === $matricula) {
+            throw new Exception(
+                'Este aluno já está cadastrado no sistema.'
+            );
+        }
+    }
+}
+\end{lstlisting}
+
+As mensagens de erro são apresentadas na interface após o tratamento da exceção.
+
+\subsection{Resposta JSON}
+
+O sistema permite consultar os dados utilizando o parâmetro \texttt{formato=json}.
+
+A resposta utiliza o cabeçalho:
+
+\begin{lstlisting}[language=PHP]
+header('Content-Type: application/json; charset=utf-8');
+\end{lstlisting}
+
+O corpo contém as coleções \texttt{veiculos} e \texttt{rotas}.
+
+Um exemplo simplificado da estrutura é:
+
+\begin{lstlisting}
+{
+    "veiculos": {
+        "ABC-1234": {
+            "placa": "ABC-1234",
+            "modelo": "Mercedes-Benz",
+            "capacidade": 20,
+            "tipo": "Ônibus"
+        }
+    },
+    "rotas": {
+        "centro": {
+            "nome": "Rota Centro",
+            "veiculo": {},
+            "alunos": [],
+            "ocupacao": "Ônibus: 0/20 vagas ocupadas"
+        }
+    }
+}
+\end{lstlisting}
+
+O exemplo acima representa a estrutura da resposta, não uma captura literal da execução.
+
+\subsection{Proteção da saída HTML}
+
+Os dados exibidos nas páginas são tratados com \texttt{htmlspecialchars()}.
+
+\begin{lstlisting}[language=PHP]
+$esc = static function (string $valor): string {
+    return htmlspecialchars(
+        $valor,
+        ENT_QUOTES,
+        'UTF-8'
+    );
+};
+\end{lstlisting}
+
+Esse tratamento evita que caracteres especiais presentes nos dados sejam interpretados como marcação HTML.
+
+\section{Testes}
+
+Os testes foram realizados por meio do arquivo \texttt{teste.php}, de requisições HTTP e de verificações manuais no navegador.
+
+\subsection{Testes das classes}
+
+O comando utilizado é:
+
+\begin{lstlisting}
+php teste.php
+\end{lstlisting}
+
+A saída esperada para os testes principais é:
+
+\begin{lstlisting}
+=== POLIMORFISMO ===
+Ônibus: 1/2 vagas ocupadas
+Van: 1/8 vagas ocupadas
+
+=== CADASTRO DE ALUNOS ===
+Ana adicionada com sucesso.
+Carlos adicionado com sucesso.
+
+=== TESTE DE ALUNO DUPLICADO ===
+Erro esperado: Este aluno já está cadastrado na rota.
+
+=== TESTE DE CAPACIDADE ===
+Erro esperado: A capacidade máxima do veículo foi atingida.
+
+=== TESTE DE VEÍCULO INVÁLIDO ===
+Erro esperado: A capacidade do veículo deve ser maior que zero.
+\end{lstlisting}
+
+O primeiro teste demonstra polimorfismo, pois diferentes objetos executam o mesmo método.
+
+Os testes seguintes verificam o cadastro de alunos e a aplicação das regras de negócio.
+
+A recusa de matrícula duplicada demonstra o funcionamento da validação implementada em \texttt{Rota}.
+
+O teste de capacidade comprova que a rota impede a inclusão de alunos acima do limite do veículo.
+
+Por fim, a criação de um veículo com capacidade zero é recusada pelo construtor.
+
+\subsection{Testes HTTP}
+
+As requisições podem ser executadas utilizando o terminal e o programa \texttt{curl}.
+
+\begin{lstlisting}
+curl -i "http://localhost:8000/?pagina=rotas"
+\end{lstlisting}
+
+Resultado esperado: HTTP 200.
+
+\begin{lstlisting}
+curl -i "http://localhost:8000/?pagina=inexistente"
+\end{lstlisting}
+
+Resultado esperado: HTTP 404.
+
+\begin{lstlisting}
+curl -i "http://localhost:8000/?formato=json"
+\end{lstlisting}
+
+Resultado esperado: HTTP 200, com o cabeçalho:
+
+\begin{lstlisting}
+Content-Type: application/json; charset=utf-8
+\end{lstlisting}
+
+Os comandos acima também estão documentados em \texttt{docs/testes.md}.
+
+\subsection{Testes dos cadastros}
+
+Após a ampliação do sistema, foram realizadas verificações manuais dos cadastros de veículos, rotas e alunos.
+
+O cadastro de veículos permite selecionar ônibus ou van, informar placa, modelo e capacidade.
+
+O cadastro de rotas permite selecionar um veículo existente.
+
+O cadastro de alunos permite escolher a rota à qual o estudante será associado.
+
+As funcionalidades foram verificadas no navegador durante o desenvolvimento.
+
+\subsection{Persistência}
+
+O armazenamento em JSON permite recuperar os registros após novas requisições e reinicialização do servidor.
+
+O arquivo é atualizado quando um cadastro é realizado com sucesso.
+
+Essa solução foi escolhida pela simplicidade e por atender ao escopo acadêmico do projeto, embora não ofereça os recursos de consulta e controle de concorrência de um banco de dados.
+
+\section{Ferramentas utilizadas}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Ferramenta} & \textbf{Para que foi usada} \\
+\midrule
+PHP 8.5 & Desenvolvimento das classes, regras de negócio e servidor local. \\
+VS Code & Escrita e edição dos arquivos do projeto. \\
+Git e GitHub & Controle de versões e armazenamento do código-fonte. \\
+curl & Verificação das respostas HTTP. \\
+Navegador e DevTools & Visualização e testes da interface web. \\
+ChatGPT & Apoio na implementação, resolução de erros e documentação. \\
+Gravador de tela & Ferramenta a informar após a gravação do vídeo. \\
+\bottomrule
+\end{tabularx}
+\caption{Ferramentas utilizadas no desenvolvimento.}
+\end{table}
+
+\section{Uso de LLM}
+
+Durante o desenvolvimento do projeto, o ChatGPT foi utilizado como ferramenta de apoio para compreender conceitos de orientação a objetos, organizar a estrutura das classes, implementar funcionalidades e solucionar problemas.
+
+A ferramenta também auxiliou na implementação da persistência em JSON, na ampliação dos cadastros e na revisão da documentação.
+
+Uma das principais contribuições foi a possibilidade de analisar mensagens de erro e compreender suas causas.
+
+Um exemplo ocorreu quando a execução de \texttt{php -l} apresentou a mensagem de que \texttt{strict\_types} precisava ser a primeira instrução do arquivo. A partir da explicação recebida, a organização inicial do código foi corrigida.
+
+Entretanto, a utilização da LLM também apresentou limitações. Durante a elaboração da documentação, uma mensagem da saída do terminal foi reproduzida incorretamente, demonstrando que respostas geradas automaticamente podem conter diferenças em relação aos resultados reais.
+
+Além disso, códigos sugeridos precisam ser testados antes de serem considerados corretos. Uma implementação aparentemente adequada pode apresentar problemas de sintaxe, validação ou comportamento durante a execução.
+
+Dessa forma, a LLM foi utilizada como apoio, e não como substituta dos testes e da análise do código.
+
+O histórico das interações está documentado no arquivo \texttt{docs/llm.md}.
+
+\section{Dificuldades, aprendizados e conclusão}
+
+Uma das dificuldades encontradas foi organizar a aplicação utilizando conceitos de orientação a objetos, especialmente ao definir quais responsabilidades deveriam pertencer a cada classe.
+
+A separação entre \texttt{Veiculo}, \texttt{Onibus}, \texttt{Van}, \texttt{Aluno} e \texttt{Rota} ajudou a compreender melhor a utilização de herança, encapsulamento e colaboração entre objetos.
+
+Outra dificuldade foi integrar as classes à camada web. Foi necessário compreender o recebimento de informações pelos formulários, a validação dos dados e o tratamento das exceções.
+
+A persistência também exigiu atenção, pois os objetos PHP precisavam ser convertidos em arrays e posteriormente reconstruídos a partir do arquivo JSON.
+
+Com a ampliação do sistema, tornou-se necessário adaptar a estrutura de armazenamento para permitir o cadastro independente de veículos e sua associação às rotas.
+
+Durante esse processo, foram reforçados conhecimentos sobre construtores, métodos, atributos privados, herança, polimorfismo, tratamento de exceções, requisições HTTP e manipulação de arquivos.
+
+O sistema desenvolvido atende ao objetivo de organizar informações básicas do transporte escolar, permitindo cadastrar veículos, rotas e alunos, consultar os registros e verificar a ocupação dos veículos.
+
+Como melhorias futuras, poderiam ser implementadas funcionalidades de edição e exclusão, autenticação de usuários e armazenamento em banco de dados.
+
+Conclui-se que o projeto contribuiu para a aplicação prática dos conceitos estudados na disciplina de Programação Web I, demonstrando como a orientação a objetos pode ser utilizada no desenvolvimento de uma aplicação web funcional.
+
+\section*{Links}
+
+\begin{itemize}
+    \item Repositório:
+    \url{https://github.com/fernando-ferreira-caval/pweb1-trabalho-oo}
+
+    \item Vídeo de apresentação:
+    \textit{Adicionar link após a gravação.}
+\end{itemize}
+
+\end{document}
