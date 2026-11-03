@@ -11,6 +11,12 @@
             "modelo": "não sei",
             "capacidade": 3,
             "tipo": "Ônibus"
+        },
+        "AFSFSA": {
+            "placa": "AFSFSA",
+            "modelo": "adfaaf",
+            "capacidade": 1,
+            "tipo": "Ônibus"
         }
     },
     "rotas": {
@@ -40,9 +46,15 @@
                     "nome": "Fernando Éverson Ferreira Cavalcante",
                     "idade": 231,
                     "endereco": "122441"
+                },
+                {
+                    "matricula": "231321421",
+                    "nome": "luiz henrique",
+                    "idade": 19,
+                    "endereco": "jese alves"
                 }
             ],
-            "ocupacao": "Ônibus: 3\/20 vagas ocupadas"
+            "ocupacao": "Ônibus: 4\/20 vagas ocupadas"
         },
         "rota-1555f579": {
             "nome": "rota complicada",
